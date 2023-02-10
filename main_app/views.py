@@ -1,24 +1,20 @@
+import os
 from django.shortcuts import render, redirect
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-'''
-from .models import Card
-from .forms import DeckForm
-'''
+from django.views.generic import ListView, DetailView
 
-from .models import Deck
+from .models import Deck, Format
 from .forms import CardForm
-
-cards = [
-  {'name': 'Sacrifice', 'game': 'MTG', 'color': 'Black' },
-  {'name': 'Warp Artifact', 'game': 'Magic the Gathering', 'color': 'Black' },
-  {'name': 'Cemetary Gate', 'game': 'Magic the Gathering', 'color': 'Black' },
-  {'name': 'Basal Thrull', 'game': 'Magic the Gathering', 'color': 'Black' },
-  {'name': 'Ragman', 'game': 'Magic the Gathering', 'color': 'Black' },
-
-]
 
 
 # Create your views here.
+def assoc_format(request, deck_id, format_id):
+  # Note that you can pass a toy's id instead of the whole toy object
+  Deck.objects.get(id=deck_id).formats.add(deck_id)
+  return redirect('detail', deck_id=deck_id)
+
+
+
 def home(request):
   return render(request, 'home.html')
 
@@ -33,8 +29,10 @@ def decks_index(request):
 
 def decks_detail(request, deck_id):
   deck = Deck.objects.get(id=deck_id)
+  id_list = deck.formats.all().values_list('id')
+  formats_deck_isnt_in = Format.objects.exclude(id__in=id_list)
   card_form = CardForm()
-  return render(request, 'decks/detail.html', {'deck':deck, 'card_form': card_form })
+  return render(request, 'decks/detail.html', {'deck':deck, 'card_form': card_form, 'format': formats_deck_isnt_in })
 
 def add_card(request, deck_id):
   form = CardForm(request.POST)
@@ -45,9 +43,10 @@ def add_card(request, deck_id):
     new_card.save()
   return redirect('detail', deck_id=deck_id)
 
+
 class DeckCreate(CreateView):
   model = Deck
-  fields = ['name', 'game', 'color'] #__all__
+  fields = ['name', 'game', 'color']
   
 class DeckUpdate(UpdateView):
   model = Deck
@@ -57,36 +56,17 @@ class DeckDelete(DeleteView):
   model = Deck
   success_url = '/decks'
 
+class FormatList(ListView):
+  model = Format
 
-'''
-def cards_index(request):
-  cards = Card.objects.all()
-  return render(request, 'cards/index.html', {'cards':cards })
+class FormatDetail(DetailView):
+  model = Format
+
+class FormatCreate(CreateView):
+  model = Format
+  fields = '__all__'
 
 
-def cards_detail(request, card_id):
-  card = Card.objects.get(id=card_id)
-  deck_form = DeckForm()
-  return render(request, 'cards/detail.html', {'card':card, 'deck_form': deck_form })
-
-def add_deck(request, card_id):
-  form = DeckForm(request.POST)
-  # validate the form
-  if form.is_valid():
-    new_deck = form.save(commit=False)
-    new_deck.card_id = card_id
-    new_deck.save()
-  return redirect('detail', card_id=card_id)
-
-class CardCreate(CreateView):
-  model = Card
-  fields = ['name', 'game', 'color'] #__all__
-  
-class CardUpdate(UpdateView):
-  model = Card
-  fields = ['game', 'color']
-  
-class CardDelete(DeleteView):
-  model = Card
-  success_url = '/cards'
-'''
+def assoc_format(request, deck_id, format_id):
+  Deck.objects.get(id=deck_id).formats.add(format_id)
+  return redirect('detail', deck_id=deck_id)
