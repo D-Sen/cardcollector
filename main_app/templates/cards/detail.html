@@ -22,8 +22,9 @@
     {% csrf_token %}
     <!-- Render the inputs -->
     {{ deck_form.as_p }}
-    <input type="submit" class="btn" value="Connect Deck">
+    <input type="submit" class="btn" value="Add Deck">
     </form>
+
     <br><hr>
     <h4>Decks containing this card</h4>
     <table class="striped">
@@ -31,10 +32,10 @@
         <tr><th>Name</th><th>Colors</th></tr>
       </thead>
       <tbody>
-        {% for Deck in card.Deck_set.all %}
+        {% for deck in card.deck_set.all %}
           <tr>
-            <td>{{Deck.name}}</td>
-            <td>{{Deck.colors}}</td>
+            <td>{{deck.name}}</td>
+            <td>{{deck.colors}}</td>
           </tr>
         {% endfor %}
       </tbody>
