@@ -32,7 +32,7 @@ def decks_detail(request, deck_id):
   id_list = deck.formats.all().values_list('id')
   formats_deck_isnt_in = Format.objects.exclude(id__in=id_list)
   card_form = CardForm()
-  return render(request, 'decks/detail.html', {'deck':deck, 'card_form': card_form, 'format': formats_deck_isnt_in })
+  return render(request, 'decks/detail.html', {'deck':deck, 'card_form': card_form, 'formats': formats_deck_isnt_in })
 
 def add_card(request, deck_id):
   form = CardForm(request.POST)
