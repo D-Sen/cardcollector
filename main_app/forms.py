@@ -1,7 +1,7 @@
 from django.forms import ModelForm
-from .models import Deck
+from .models import Card
 
-class DeckForm(ModelForm):
+class CardForm(ModelForm):
   class Meta:
-    model = Deck
+    model = Card
     fields = ['name', 'colors']
